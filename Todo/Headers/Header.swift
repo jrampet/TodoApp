@@ -11,6 +11,7 @@ class Header: UITableViewHeaderFooterView {
 
     @IBOutlet weak var taskField : UITextField!
     @IBOutlet var addImage  : UIImageView!
+    @IBOutlet var headLabel : UILabel!
     var tapAdd:((_ newTask: String)->())?
         override func awakeFromNib() {
             super.awakeFromNib()

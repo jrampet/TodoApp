@@ -7,49 +7,15 @@
 
 import UIKit
 import CoreData
-class TaskHelper : Task{
-    static let container = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
-   
-    static func insert(newTask task:String,completion:@escaping()->()){
-//        let context = container.viewContext
-        let context = container.newBackgroundContext()
-        /*let newTask = Task(context: context)
-        newTask.task = task
-        newTask.date = getDate()
-        save()
-        completion()*/
-        context.performAndWait {
-            
-            let newTask = Task(context: context)
-            newTask.task = task
-            newTask.date = getDate()
-            context.saveContext()
-            completion()
-        }
+class TaskHelper{
+    static func delete(completedTask:NSManagedObject){
+        print("Deleting")
+        let context = Core.container.viewContext
+        context.remove(completedTask)
     }
     
-    static func delete(completedTask:Task){
-        let context = container.viewContext
-        context.delete(completedTask)
-        context.saveContext()
-    }
-    static func fetchAll(completion:([Task])->()){
-        let context = container.viewContext
-        do{
-            let task :[Task] = try context.fetch(Task.fetchRequest())
-            completion(task)
-        }catch{
-            print("Error in Fetch")
-        }
-    }
-    static func getDate()->String{
-        let date = NSDate()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM/yyyy hh:mm:ss:a"
-        let dateString = dateFormatter.string(from: date as Date)
-        return dateString
-    }
 }
+
 extension NSManagedObjectContext{
     func saveContext(){
         do{
@@ -66,4 +32,15 @@ extension NSManagedObjectContext{
     
 
 }
-
+/*extension NSManagedObject{
+    func fetchAll(){
+        let container = TaskHelper.container
+        let context = container.viewContext
+        do{
+            let task = try context.fetch(.fetchRequest())
+            completion(task)
+        }catch{
+            print("Error in Fetch")
+        }
+    }
+}*/

@@ -20,6 +20,11 @@ class TaskCell: UITableViewCell {
         self.task.text = task.task
         self.dateAdded.text = task.date
     }
-
+    
+    func configure(subTask: SubTask){
+//        print(task.date,task.task)
+        self.task.text = subTask.task
+        self.dateAdded.text = subTask.date
+    }
     
 }

@@ -2,7 +2,7 @@
 //  Task+CoreDataProperties.swift
 //  Todo
 //
-//  Created by Jeyaram on 09/06/21.
+//  Created by Jeyaram on 11/06/21.
 //
 //
 
@@ -16,8 +16,26 @@ extension Task {
         return NSFetchRequest<Task>(entityName: "Task")
     }
 
-    @NSManaged public var task: String?
     @NSManaged public var date: String?
+    @NSManaged public var task: String?
+    @NSManaged public var subtask: NSSet?
+
+}
+
+// MARK: Generated accessors for subtask
+extension Task {
+
+    @objc(addSubtaskObject:)
+    @NSManaged public func addToSubtask(_ value: SubTask)
+
+    @objc(removeSubtaskObject:)
+    @NSManaged public func removeFromSubtask(_ value: SubTask)
+
+    @objc(addSubtask:)
+    @NSManaged public func addToSubtask(_ values: NSSet)
+
+    @objc(removeSubtask:)
+    @NSManaged public func removeFromSubtask(_ values: NSSet)
 
 }
 

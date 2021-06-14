@@ -50,6 +50,7 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="addImage" destination="0kl-Do-Oxe" id="0vc-Vt-nib"/>
+                <outlet property="headLabel" destination="TU7-l0-QXQ" id="KuW-hP-fWK"/>
                 <outlet property="taskField" destination="mla-QF-Ny4" id="6y2-wx-ZwW"/>
             </connections>
             <point key="canvasLocation" x="192.75362318840581" y="215.29017857142856"/>
