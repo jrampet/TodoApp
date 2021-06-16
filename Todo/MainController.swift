@@ -22,12 +22,9 @@ class MainController: UIViewController {
     let mainStoryBoard = UIStoryboard(name: Constants.mainStoryBoard , bundle: nil)
     override func viewDidLoad() {
         super.viewDidLoad()
-        table.register(UINib(nibName: Constants.cellIdentifier, bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
-        
-        table.register(UINib(nibName: Constants.Xib.header, bundle: nil), forHeaderFooterViewReuseIdentifier: Constants.Xib.header)
-        table.delegate = self
-        table.dataSource = self
-        fetchRequest()
+        registerCell()
+//        fetchRequest()
+        fetchGeneric()
 //        newBackground()
  
         // Do any additional setup after loading the view.
@@ -45,7 +42,7 @@ extension MainController : UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier,for: indexPath) as! TaskCell
         cell.configure(task: tasks[indexPath.row])
-        print(tasks[indexPath.row].task)
+//        print(tasks[indexPath.row].task)
         return cell
     }
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -56,7 +53,7 @@ extension MainController : UITableViewDelegate,UITableViewDataSource{
             (data) in
             if let self = self{
                 Task.insert(newTask: data,completion: {
-                    self.fetchRequest()
+                    self.fetchGeneric()
                 })
             }
             
@@ -77,13 +74,14 @@ extension MainController : UITableViewDelegate,UITableViewDataSource{
             guard let self = self else{return}
             let remove = self.tasks[indexPath.row]
             TaskHelper.delete(completedTask: remove)
-            self.fetchRequest()
+            self.fetchGeneric()
         })
         return UISwipeActionsConfiguration(actions: [contextItem])
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let newController = self.mainStoryBoard.instantiateViewController(identifier: Constants.subTaskIdentifier) as SubTaskController
-        newController.currentTask = tasks[indexPath.row]
+//        newController.currentTask = tasks[indexPath.row]
+        newController.currentTaskId = tasks[indexPath.row].objectID
         self.pushController(newController, with: tasks[indexPath.row].task!)
     }
   
@@ -91,13 +89,26 @@ extension MainController : UITableViewDelegate,UITableViewDataSource{
 
 extension MainController{
  
-    func fetchRequest(){
-        Task.fetchAll(completion: {
+//    func fetchRequest(){
+//        Task.fetchAll(completion: {
+//            (data) in
+//            tasks = data
+//        })
+//    }
+    
+    func fetchGeneric(){
+        TaskHelper.fetchData(entity: Task.self, completion: {
             (data) in
-            tasks = data
+            if let data = data{
+                tasks = data
+            }
         })
     }
-  
+    func registerCell(){
+        table.register(UINib(nibName: Constants.cellIdentifier, bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
+        
+        table.register(UINib(nibName: Constants.Xib.header, bundle: nil), forHeaderFooterViewReuseIdentifier: Constants.Xib.header)
+    }
 }
 
 struct Constants{

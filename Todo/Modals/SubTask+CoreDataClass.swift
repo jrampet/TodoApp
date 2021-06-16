@@ -32,15 +32,48 @@ public class SubTask: NSManagedObject {
         }
     }
     
-    static func insertSubTask(newTask task:String,under parentTask: Task,completion:@escaping()->()){
-            Core.backgroundContext.perform {
-            let newTask = SubTask(context: Core.viewcontext)
-            newTask.task = task
-            newTask.date = Utilities.getDate()
-            newTask.parentTask = parentTask
-            Core.backgroundContext.saveContext()
-            completion()
-        }
+    static func insertSubTask(newTask task:String,under parentTask: NSManagedObjectID,completion:@escaping()->()){
+        let context = Core.viewcontext
+        guard let localParent = context.object(with: parentTask) as? Task else{return}
+        let predicate = NSPredicate(format: "parentTask == %@ && task == %@",localParent,task)
+        TaskHelper.fetchData(entity: SubTask.self, namePredicate: predicate, completion: {
+            (data) in
+            guard let data = data else{return}
+            if data.count == 0{
+                context.perform {
+                let newTask = SubTask(context: context)
+                    newTask.task = task
+                    newTask.date = Utilities.getDate()
+                    newTask.parentTask = localParent
+                    context.saveContext()
+                    completion()
+                }
+            }else{
+                data[0].task = task
+            }
+//            print(data[0].task)
+        })
+
+        
         
     }
 }
+/*
+ let context = Core.backgroundContext
+ let predicate = NSPredicate(format: "task == %@",task)
+ TaskHelper.fetchData(entity: Task.self, namePredicate: predicate, completion: {(data) in
+     guard let data = data else{return}
+     if(data.count == 0){
+         context.perform {
+              let newTask = Task(context: context)
+              newTask.task = task
+              newTask.date = Utilities.getDate()
+              context.saveContext()
+              completion()
+          }
+     }else{
+         data[0].setValue(task, forKey: "task")
+     }
+     
+ })
+ */

@@ -16,14 +16,11 @@ class SubTaskController: UIViewController {
             }
         }
     }
-    var currentTask : Task?
+//    var currentTask : Task?
+    var currentTaskId : NSManagedObjectID?
     override func viewDidLoad() {
         super.viewDidLoad()
-        table.register(UINib(nibName: Constants.cellIdentifier, bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
-        
-        table.register(UINib(nibName: Constants.Xib.header, bundle: nil), forHeaderFooterViewReuseIdentifier: Constants.Xib.header)
-        table.delegate = self
-        table.dataSource  = self
+        registerCell()
         fetchRequest()
         // Do any additional setup after loading the view.
     }
@@ -52,18 +49,22 @@ extension SubTaskController : UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let currentTask = currentTask else{return UIView()}
+//        guard let currentTask = currentTask else{return UIView()}
         let headerView:Header = tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.Xib.header) as! Header
         headerView.tintColor = .white
         headerView.headLabel.text = "Add your Sub Task"
         (subTasks.count == 0) ? (headerView.taskField.placeholder = "Add your first SubTask") : (headerView.taskField.placeholder = "Add your SubTask")
         headerView.tapAdd = {[weak self]
             (data) in
-            if let self = self{
-                SubTask.insertSubTask(newTask: data, under: currentTask,completion: {
+            guard let self = self else{return}
+                guard let currentTaskId = self.currentTaskId else{return}
+//                SubTask.insertSubTask(newTask: data, under: currentTask,completion: {
+//                    self.fetchRequest()
+//                })
+            SubTask.insertSubTask(newTask: data, under: currentTaskId,completion: {
                     self.fetchRequest()
                 })
-            }
+            
             
         }
         return headerView
@@ -77,12 +78,29 @@ extension SubTaskController : UITableViewDelegate,UITableViewDataSource{
 
 extension SubTaskController{
  
-    func fetchRequest(){
+    /*func fetchRequest(){
         guard let currentTask = currentTask else{return}
         SubTask.fetchTask(under: currentTask, completion: {
             (data) in
             subTasks = data
         })
+    }*/
+    func fetchRequest(){
+        guard  let currentTaskId = currentTaskId else {return}
+        let currentTask = Core.viewcontext.object(with: currentTaskId)
+        let predicate = NSPredicate(format: "parentTask == %@",currentTask)
+        TaskHelper.fetchData(entity: SubTask.self,namePredicate: predicate, completion: {
+            (data) in
+            if let data = data{
+                subTasks = data
+            }
+        })
+    }
+    
+    func registerCell(){
+        table.register(UINib(nibName: Constants.cellIdentifier, bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
+        
+        table.register(UINib(nibName: Constants.Xib.header, bundle: nil), forHeaderFooterViewReuseIdentifier: Constants.Xib.header)
     }
   
 }

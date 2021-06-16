@@ -21,12 +21,22 @@ public class Task: NSManagedObject {
         }
     }
     static func insert(newTask task:String,completion:@escaping()->()){
-        Core.backgroundContext.perform {
-            let newTask = Task(context: Core.backgroundContext)
-            newTask.task = task
-            newTask.date = Utilities.getDate()
-            Core.backgroundContext.saveContext()
-            completion()
-        }
+        let context = Core.backgroundContext
+        let predicate = NSPredicate(format: "task == %@",task)
+        TaskHelper.fetchData(entity: Task.self, namePredicate: predicate, completion: {(data) in
+            guard let data = data else{return}
+            if(data.count == 0){
+                context.perform {
+                     let newTask = Task(context: context)
+                     newTask.task = task
+                     newTask.date = Utilities.getDate()
+                     context.saveContext()
+                     completion()
+                 }
+            }else{
+                data[0].setValue(task, forKey: "task")
+            }
+            
+        })
     }
 }

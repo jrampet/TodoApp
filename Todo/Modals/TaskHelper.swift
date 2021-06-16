@@ -10,9 +10,22 @@ import CoreData
 class TaskHelper{
     static func delete(completedTask:NSManagedObject){
         print("Deleting")
-        let context = Core.container.viewContext
+        let context = Core.viewcontext
         context.remove(completedTask)
     }
+    
+    static func fetchData<T:NSManagedObject>(entity:T.Type,namePredicate:NSPredicate?=nil,completion:([T]?)->()){
+        do{
+            let request = T.fetchRequest()
+            request.predicate = namePredicate
+            let task = try Core.viewcontext.fetch(request) as? [T]
+            
+            completion(task)
+        }catch{
+            print("Errors")
+        }
+    }
+    
     
 }
 
