@@ -36,6 +36,7 @@ public class SubTask: NSManagedObject {
         let context = Core.viewcontext
         guard let localParent = context.object(with: parentTask) as? Task else{return}
         let predicate = NSPredicate(format: "parentTask == %@ && task == %@",localParent,task)
+        
         TaskHelper.fetchData(entity: SubTask.self, namePredicate: predicate, completion: {
             (data) in
             guard let data = data else{return}
